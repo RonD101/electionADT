@@ -1,0 +1,8 @@
+//
+// Created by yoav on 14/04/2020.
+//
+
+#ifndef ELECTIONADT_ELECTION_H
+#define ELECTIONADT_ELECTION_H
+
+#endif //ELECTIONADT_ELECTION_H
