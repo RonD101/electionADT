@@ -10,16 +10,71 @@
 
 #define LAST_DIGIT 10
 #define FIRST_NUMBER '0'
+#define FIRST_LOWER_CASE_LETTER 'a'
+#define LAST_LOWER_CASE_LETTER 'z'
+#define SPACE ' '
 
 static char* toString(int num);
 static int toInt(char* str);
+bool stringValid(const char*);
 
 struct election_t
 {
     Map areas;
     Map tribes;
-    Votes *areaToTribe;
+    Votes votes;
 };
+
+void electionDestroy(Election election)
+{
+    if(election != NULL)
+    {
+        //Destroys all properties under election via mapADT and votesADT
+        mapDestroy(election->areas);
+        mapDestroy(election->tribes);
+        voteDestroy(election->votes);
+    }
+}
+
+ElectionResult electionAddTribe(Election election, int tribe_id, const char* tribe_name)
+{
+    if(election == NULL)
+    {
+        return ELECTION_NULL_ARGUMENT;
+    }
+    if(tribe_id < 0)
+    {
+        return ELECTION_INVALID_ID;
+    }
+    char* str = toString(tribe_id);
+    if(mapContains(election->tribes, str))
+    {
+        return ELECTION_TRIBE_ALREADY_EXIST;
+    }
+    free(str);
+    if(!(stringValid(tribe_name)))
+    {
+        return ELECTION_INVALID_NAME;
+    }
+    return ELECTION_SUCCESS;
+}
+
+//checks if string passed is all lower case letters + spaces and returns true/false
+bool stringValid(const char* str)
+{
+    int len = strlen(str);
+    for(int i = 0; i < len; i++)
+    {
+        if(!(str[i] > FIRST_LOWER_CASE_LETTER && str[i] < LAST_LOWER_CASE_LETTER))
+        {
+            if(str[i] != SPACE)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 static char* toString(int num){
     int temp = num,counter = 0;
