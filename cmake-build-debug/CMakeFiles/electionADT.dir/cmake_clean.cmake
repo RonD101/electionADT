@@ -1,5 +1,8 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/electionADT.dir/election.c.o"
   "CMakeFiles/electionADT.dir/main.c.o"
+  "CMakeFiles/electionADT.dir/mtm_map/map.c.o"
+  "CMakeFiles/electionADT.dir/votes.c.o"
   "electionADT"
   "electionADT.pdb"
 )

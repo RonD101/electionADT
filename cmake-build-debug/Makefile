@@ -123,6 +123,33 @@ electionADT/fast:
 	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/build
 .PHONY : electionADT/fast
 
+election.o: election.c.o
+
+.PHONY : election.o
+
+# target to build an object file
+election.c.o:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/election.c.o
+.PHONY : election.c.o
+
+election.i: election.c.i
+
+.PHONY : election.i
+
+# target to preprocess a source file
+election.c.i:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/election.c.i
+.PHONY : election.c.i
+
+election.s: election.c.s
+
+.PHONY : election.s
+
+# target to generate assembly for a file
+election.c.s:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/election.c.s
+.PHONY : election.c.s
+
 main.o: main.c.o
 
 .PHONY : main.o
@@ -150,6 +177,60 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/main.c.s
 .PHONY : main.c.s
 
+mtm_map/map.o: mtm_map/map.c.o
+
+.PHONY : mtm_map/map.o
+
+# target to build an object file
+mtm_map/map.c.o:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/mtm_map/map.c.o
+.PHONY : mtm_map/map.c.o
+
+mtm_map/map.i: mtm_map/map.c.i
+
+.PHONY : mtm_map/map.i
+
+# target to preprocess a source file
+mtm_map/map.c.i:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/mtm_map/map.c.i
+.PHONY : mtm_map/map.c.i
+
+mtm_map/map.s: mtm_map/map.c.s
+
+.PHONY : mtm_map/map.s
+
+# target to generate assembly for a file
+mtm_map/map.c.s:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/mtm_map/map.c.s
+.PHONY : mtm_map/map.c.s
+
+votes.o: votes.c.o
+
+.PHONY : votes.o
+
+# target to build an object file
+votes.c.o:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/votes.c.o
+.PHONY : votes.c.o
+
+votes.i: votes.c.i
+
+.PHONY : votes.i
+
+# target to preprocess a source file
+votes.c.i:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/votes.c.i
+.PHONY : votes.c.i
+
+votes.s: votes.c.s
+
+.PHONY : votes.s
+
+# target to generate assembly for a file
+votes.c.s:
+	$(MAKE) -f CMakeFiles/electionADT.dir/build.make CMakeFiles/electionADT.dir/votes.c.s
+.PHONY : votes.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -159,9 +240,18 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... electionADT"
+	@echo "... election.o"
+	@echo "... election.i"
+	@echo "... election.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... mtm_map/map.o"
+	@echo "... mtm_map/map.i"
+	@echo "... mtm_map/map.s"
+	@echo "... votes.o"
+	@echo "... votes.i"
+	@echo "... votes.s"
 .PHONY : help
 
 

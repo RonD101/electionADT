@@ -78,7 +78,25 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/election.c">
+			<Option target="electionADT"/>
+		</Unit>
+		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/election.h">
+			<Option target="electionADT"/>
+		</Unit>
 		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/main.c">
+			<Option target="electionADT"/>
+		</Unit>
+		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/mtm_map/map.c">
+			<Option target="electionADT"/>
+		</Unit>
+		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/mtm_map/map.h">
+			<Option target="electionADT"/>
+		</Unit>
+		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/votes.c">
+			<Option target="electionADT"/>
+		</Unit>
+		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/votes.h">
 			<Option target="electionADT"/>
 		</Unit>
 		<Unit filename="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/CMakeLists.txt">

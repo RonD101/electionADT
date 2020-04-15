@@ -70,17 +70,62 @@ CMakeFiles/electionADT.dir/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/electionADT.dir/main.c.s"
 	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/main.c" -o CMakeFiles/electionADT.dir/main.c.s
 
+CMakeFiles/electionADT.dir/election.c.o: CMakeFiles/electionADT.dir/flags.make
+CMakeFiles/electionADT.dir/election.c.o: ../election.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/electionADT.dir/election.c.o"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/electionADT.dir/election.c.o   -c "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/election.c"
+
+CMakeFiles/electionADT.dir/election.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/electionADT.dir/election.c.i"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/election.c" > CMakeFiles/electionADT.dir/election.c.i
+
+CMakeFiles/electionADT.dir/election.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/electionADT.dir/election.c.s"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/election.c" -o CMakeFiles/electionADT.dir/election.c.s
+
+CMakeFiles/electionADT.dir/mtm_map/map.c.o: CMakeFiles/electionADT.dir/flags.make
+CMakeFiles/electionADT.dir/mtm_map/map.c.o: ../mtm_map/map.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/electionADT.dir/mtm_map/map.c.o"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/electionADT.dir/mtm_map/map.c.o   -c "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/mtm_map/map.c"
+
+CMakeFiles/electionADT.dir/mtm_map/map.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/electionADT.dir/mtm_map/map.c.i"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/mtm_map/map.c" > CMakeFiles/electionADT.dir/mtm_map/map.c.i
+
+CMakeFiles/electionADT.dir/mtm_map/map.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/electionADT.dir/mtm_map/map.c.s"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/mtm_map/map.c" -o CMakeFiles/electionADT.dir/mtm_map/map.c.s
+
+CMakeFiles/electionADT.dir/votes.c.o: CMakeFiles/electionADT.dir/flags.make
+CMakeFiles/electionADT.dir/votes.c.o: ../votes.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/electionADT.dir/votes.c.o"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/electionADT.dir/votes.c.o   -c "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/votes.c"
+
+CMakeFiles/electionADT.dir/votes.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/electionADT.dir/votes.c.i"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/votes.c" > CMakeFiles/electionADT.dir/votes.c.i
+
+CMakeFiles/electionADT.dir/votes.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/electionADT.dir/votes.c.s"
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/votes.c" -o CMakeFiles/electionADT.dir/votes.c.s
+
 # Object files for target electionADT
 electionADT_OBJECTS = \
-"CMakeFiles/electionADT.dir/main.c.o"
+"CMakeFiles/electionADT.dir/main.c.o" \
+"CMakeFiles/electionADT.dir/election.c.o" \
+"CMakeFiles/electionADT.dir/mtm_map/map.c.o" \
+"CMakeFiles/electionADT.dir/votes.c.o"
 
 # External object files for target electionADT
 electionADT_EXTERNAL_OBJECTS =
 
 electionADT: CMakeFiles/electionADT.dir/main.c.o
+electionADT: CMakeFiles/electionADT.dir/election.c.o
+electionADT: CMakeFiles/electionADT.dir/mtm_map/map.c.o
+electionADT: CMakeFiles/electionADT.dir/votes.c.o
 electionADT: CMakeFiles/electionADT.dir/build.make
 electionADT: CMakeFiles/electionADT.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable electionADT"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/Users/rond/Desktop/רון/טכניון/מבוא לתכנות מערכות/hw1/electionADT/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable electionADT"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/electionADT.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
