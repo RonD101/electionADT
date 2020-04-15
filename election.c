@@ -16,9 +16,9 @@ static int toInt(char* str);
 
 struct election_t
 {
-    Map zones;
-    Map *tribes;
-    Votes *zoneToTribe;
+    Map areas;
+    Map tribes;
+    Votes *areaToTribe;
 };
 
 static char* toString(int num){
