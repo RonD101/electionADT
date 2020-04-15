@@ -15,7 +15,6 @@ typedef enum VoteResult_t {
     VOTES_SUCCESS,
     VOTES_INVALID_ID,
     VOTES_TRIBE_ALREADY_EXIST,
-    VOTES_INVALID_NAME,
     VOTES_AREA_ALREADY_EXIST,
     VOTES_TRIBE_NOT_EXIST,
     VOTES_AREA_NOT_EXIST,
@@ -28,7 +27,7 @@ void voteDestroy(Votes vote);
 
 VoteResult voteAddTribe(Votes vote, int tribe_id);
 
-VoteResult voteAddArea(Votes vote, int area_id);
+VoteResult voteAddArea(Votes vote, int area_id, int tribe_id);
 
 VoteResult voteRemoveTribe(Votes vote, int tribe_id);
 
