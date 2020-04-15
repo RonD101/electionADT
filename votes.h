@@ -5,6 +5,8 @@
 #ifndef ELECTIONADT_VOTES_H
 #define ELECTIONADT_VOTES_H
 
+#include <stdbool.h>
+
 typedef struct votes_t* Votes;
 
 typedef enum VoteResult_t {
@@ -33,6 +35,8 @@ VoteResult voteRemoveTribe(Votes vote, int tribe_id);
 VoteResult voteRemoveArea(Votes vote, int area_id);
 
 VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int votes_num);
+
+bool voteTribeContain(Votes vote, const int tribe_id);
 
 
 #endif //ELECTIONADT_VOTES_H
