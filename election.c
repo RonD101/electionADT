@@ -6,6 +6,7 @@
 #include "election.h"
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
 static char* toString(int num);
 static int toInt(char* str);
@@ -18,7 +19,20 @@ struct election_t
 
 
 static char* toString(int num){
-
+    int temp = num,counter = 0;
+    while (temp){
+        counter++;
+        temp /= 10;
+    }
+    char *str = malloc(sizeof(char)*counter);
+    if(str == NULL){
+        return NULL;
+    }
+    for (int i = counter-1; i >= 0; ++i) {
+        str[i] = num%10 + '0';
+        num /= 10;
+    }
+    return str;
 }
 
 static int toInt(char* str)
