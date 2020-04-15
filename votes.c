@@ -5,6 +5,7 @@
 #include "votes.h"
 #include "mtm_map/map.h"
 #include <stdlib.h>
+#include <assert.h>
 
 #define INITIAL_SIZE 2
 #define EXPAND_FACTOR 2
@@ -17,6 +18,19 @@ struct votes_t{
     int size;
     int maxSize;
 };
+
+void voteDestroy(Votes vote)
+{
+    if(vote != NULL)
+    {
+        for(int i = 0; i < vote->size; i++)
+        {
+            mapDestroy(vote->map_area[i]); //uses mapADT function to destroy each area
+        }
+        free(vote->tribes); //deallocates memory from tribes
+        free(vote); //deallocates memory from the vote struct
+    }
+}
 
 Votes voteCreate(){
     Votes vote = malloc(sizeof(*vote));
@@ -38,9 +52,37 @@ Votes voteCreate(){
 
 VoteResult voteAddArea(Votes vote, int area_id, int tribe_id,int votes_num){
     if(vote == NULL ){
+VoteResult voteAddTribe(Votes vote, int tribe_id)
+{
+    if(vote == NULL)
+    {
+        return VOTES_NULL_ARGUMENT;
+    }
+    if(toInt(tribe_id) < 0)
+    {
+        return VOTES_INVALID_ID;
+    }
+    if(voteTribeContain(vote, tribe_id) >= 0)
+    {
+        return VOTES_TRIBE_ALREADY_EXIST;
+    }
+    assert(vote->size < vote->maxSize);
+    vote->tribes[vote->size] = toString(tribe_id);
+    vote->size++;
+    //vote->tribes[vote->size++] = malloc(strlen(toString(tribe_id)));
+    //vote->tribes[vote->size] = toString(tribe_id);
+    return VOTES_SUCCESS;
+}
+
+VoteResult voteRemoveTribe(Votes vote, int tribe_id)
+{
+    if(vote == NULL)
+    {
         return VOTES_NULL_ARGUMENT;
     }
     if(area_id < 0 || tribe_id < 0){
+    if(tribe_id < 0)
+    {
         return VOTES_INVALID_ID;
     }
     int tribe_num = voteTribeContain(vote,tribe_id);
@@ -53,7 +95,17 @@ VoteResult voteAddArea(Votes vote, int area_id, int tribe_id,int votes_num){
         return VOTES_OUT_OF_MEMORY;
     }
     return VOTES_SUCCESS;
+    if(voteTribeContain(vote, tribe_id) < FIRST_NUMBER)
+    {
+        return VOTES_TRIBE_NOT_EXIST;
+    }
+    mapDestroy(vote->map_area[index]);
+    free(vote->tribes[index]);
+    vote->tribes[index] = vote->tribes[vote->size];
+    vote->size--;
+    return VOTES_SUCCESS;
 }
+
 
 static char* toString(int num){
     int temp = num,counter = 0;
