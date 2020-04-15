@@ -41,6 +41,7 @@ static char* toString(int num);
 
 static int toInt(char* str);
 
+static VoteResult expand(Votes map);
 
 
 #endif //ELECTIONADT_VOTES_H

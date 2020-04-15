@@ -165,3 +165,68 @@ int voteTribeContain(Votes vote, int tribe_id){
     }
     return -1;
 }
+
+VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int votes_num){
+    if(vote == NULL){
+        return VOTES_NULL_ARGUMENT;
+    }
+    if(tribe_id < 0 || area_id < 0){
+        return VOTES_INVALID_ID;
+    }
+    if(votes_num < 0){
+        return VOTES_INVALID_VOTES;
+    }
+    int tribe_num = voteTribeContain(vote, tribe_id);
+    if(tribe_num != -1){
+        char* key = toString(area_id);
+        if(key == NULL){
+            return VOTES_OUT_OF_MEMORY;
+        }
+        if(mapGet(vote->map_area[tribe_num], key) != NULL){//updating the amount of votes
+            int new_vote_value = toInt(mapGet(vote->map_area[tribe_num], key)) + votes_num;
+            char* new_vote_value_str = toString(new_vote_value);
+            if(new_vote_value_str == NULL){
+                return VOTES_OUT_OF_MEMORY;
+            }
+            mapPut(vote->map_area[tribe_num],key,new_vote_value_str);
+            free(new_vote_value_str);
+            free(key);
+            return VOTES_SUCCESS;
+        }else{//creating a new area for this tribe
+            if(voteAddArea(vote,area_id,tribe_id,votes_num) == VOTES_OUT_OF_MEMORY){
+                return VOTES_OUT_OF_MEMORY;
+            }
+            return VOTES_SUCCESS;
+        }
+    } else{//creating a new tribe and area with associated number of votes
+        if(vote->size == vote->maxSize){
+            if(expand(vote) == VOTES_OUT_OF_MEMORY){
+                return VOTES_OUT_OF_MEMORY;
+            }
+        }
+        if(voteAddTribe(vote,tribe_id) == VOTES_OUT_OF_MEMORY){
+            return VOTES_OUT_OF_MEMORY;
+        }
+        if(voteAddArea(vote,area_id,tribe_id,votes_num) == VOTES_OUT_OF_MEMORY){
+            voteRemoveTribe(vote,tribe_id);
+            return VOTES_OUT_OF_MEMORY;
+        }
+        return VOTES_SUCCESS;
+    }
+}
+
+static VoteResult expand(Votes vote){
+    int newSize = EXPAND_FACTOR * vote->maxSize;
+    char **new_tribes = realloc(vote->tribes,sizeof(char*)*newSize);
+    Map *new_map_area = realloc(vote->map_area, sizeof(Map)*newSize);
+    if (new_tribes == NULL || new_map_area == NULL) {
+        free(new_map_area);
+        free(new_tribes);
+        return VOTES_OUT_OF_MEMORY;
+    }
+    //updating the pointers
+    vote->tribes = new_tribes;
+    vote->map_area = new_map_area;
+    vote->maxSize = newSize;
+    return VOTES_SUCCESS;
+}
