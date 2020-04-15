@@ -75,7 +75,7 @@ VoteResult voteAddTribe(Votes vote, int tribe_id)
     {
         return VOTES_NULL_ARGUMENT;
     }
-    if(toInt(tribe_id) < 0)
+    if(tribe_id < 0)
     {
         return VOTES_INVALID_ID;
     }
@@ -106,6 +106,25 @@ VoteResult voteRemoveTribe(Votes vote, int tribe_id)
     free(vote->tribes[index]);
     vote->tribes[index] = vote->tribes[vote->size];
     vote->size--;
+    return VOTES_SUCCESS;
+}
+
+VoteResult voteRemoveArea(Votes vote, int area_id)
+{
+    if(vote == NULL)
+    {
+        return VOTES_NULL_ARGUMENT;
+    }
+    for(int i = 0; i < vote->size; i++)
+    {
+        char* key = toString(area_id);
+        if(key == NULL)
+        {
+            return VOTES_OUT_OF_MEMORY;
+        }
+        mapRemove(vote->map_area[i], key);
+        free(key);
+    }
     return VOTES_SUCCESS;
 }
 
