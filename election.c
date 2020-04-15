@@ -4,6 +4,7 @@
 
 #include "mtm_map/map.h"
 #include "election.h"
+#include "votes.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -17,6 +18,7 @@ struct election_t
 {
     Map zones;
     Map *tribes;
+    Votes *zoneToTribe;
 };
 
 static char* toString(int num){

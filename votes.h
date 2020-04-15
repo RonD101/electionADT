@@ -5,4 +5,8 @@
 #ifndef ELECTIONADT_VOTES_H
 #define ELECTIONADT_VOTES_H
 
+typedef struct votes_t* Votes;
+
+
+
 #endif //ELECTIONADT_VOTES_H
