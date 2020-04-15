@@ -36,16 +36,24 @@ Votes voteCreate(){
     return vote;
 }
 
-VoteResult voteAddArea(Votes vote, int area_id, int tribe_id){
+VoteResult voteAddArea(Votes vote, int area_id, int tribe_id,int votes_num){
     if(vote == NULL ){
         return VOTES_NULL_ARGUMENT;
     }
-    if(vote < 0){
+    if(area_id < 0 || tribe_id < 0){
         return VOTES_INVALID_ID;
     }
-
+    int tribe_num = voteTribeContain(vote,tribe_id);
+    if(tribe_num == -1){
+        if(voteAddTribe(vote,tribe_id) == VOTES_OUT_OF_MEMORY){
+            return VOTES_OUT_OF_MEMORY;
+        }
+    }
+    if(mapPut(vote->map_area[tribe_num],toString(area_id),toString(votes_num)) == MAP_OUT_OF_MEMORY){
+        return VOTES_OUT_OF_MEMORY;
+    }
+    return VOTES_SUCCESS;
 }
-
 
 static char* toString(int num){
     int temp = num,counter = 0;
@@ -74,4 +82,13 @@ static int toInt(char* str)
         num += str[j] - FIRST_NUMBER;
     }
     return num;
+}
+
+int voteTribeContain(Votes vote, int tribe_id){
+    for (int i = 0; i < vote->size; ++i) {
+        if(toInt(vote->tribes[i]) == tribe_id){
+            return i;
+        }
+    }
+    return -1;
 }

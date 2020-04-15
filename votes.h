@@ -42,4 +42,5 @@ static char* toString(int num);
 static int toInt(char* str);
 
 
+
 #endif //ELECTIONADT_VOTES_H
