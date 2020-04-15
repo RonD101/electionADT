@@ -36,7 +36,10 @@ VoteResult voteRemoveArea(Votes vote, int area_id);
 
 VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int votes_num);
 
-bool voteTribeContain(Votes vote, const int tribe_id);
+char* voteTribeContain(Votes vote, const int tribe_id);
 
+static char* toString(int num);
+
+static int toInt(char* str);
 
 #endif //ELECTIONADT_VOTES_H
