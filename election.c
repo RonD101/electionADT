@@ -5,8 +5,8 @@
 #include "mtm_map/map.h"
 #include "election.h"
 
-static toString(int num);
-static toInt(char* str);
+static char* toString(int num);
+static int toInt(char* str);
 
 struct election_t
 {
@@ -15,10 +15,10 @@ struct election_t
 };
 
 
-static toString(int num){
+static char* toString(int num){
 
 }
 
-static toInt(char* str){
+static int toInt(char* str){
 
 }
