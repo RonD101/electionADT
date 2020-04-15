@@ -8,8 +8,8 @@
 #include <math.h>
 #include <stdlib.h>
 
-static char* toString(int num);
-static int toInt(char* str);
+//char* toString(int num);
+//int toInt(char* str);
 
 struct election_t
 {
@@ -18,13 +18,13 @@ struct election_t
 };
 
 
-static char* toString(int num){
+char* toString(int num){
     int temp = num,counter = 0;
     while (temp){
         counter++;
         temp /= 10;
     }
-    char *str = malloc(sizeof(char)*counter);
+    char *str = malloc(sizeof(char)*counter + 1);
     if(str == NULL){
         return NULL;
     }
@@ -32,10 +32,11 @@ static char* toString(int num){
         str[i] = num%10 + '0';
         num /= 10;
     }
+    str[counter] = 0;
     return str;
 }
 
-static int toInt(char* str)
+int toInt(char* str)
 {
     int i = strlen(str);
     int num = 0;
