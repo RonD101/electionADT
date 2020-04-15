@@ -32,5 +32,7 @@ VoteResult voteRemoveTribe(Votes vote, int tribe_id);
 
 VoteResult voteRemoveArea(Votes vote, int area_id);
 
+VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int votes_num);
+
 
 #endif //ELECTIONADT_VOTES_H
