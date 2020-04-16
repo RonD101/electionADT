@@ -37,6 +37,8 @@ VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int 
 
 int voteTribeContain(Votes vote,int tribe_id);
 
+int voteNumOfVotes(Votes vote, int area_id, int tribe_id);
+
 static char* toString(int num);
 
 static int toInt(char* str);

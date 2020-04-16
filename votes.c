@@ -230,3 +230,33 @@ static VoteResult expand(Votes vote){
     vote->maxSize = newSize;
     return VOTES_SUCCESS;
 }
+
+
+int voteNumOfVotes(Votes vote, int area_id, int tribe_id)
+{
+    if(vote == NULL )
+    {
+        return VOTES_NULL_ARGUMENT;
+    }
+    if(area_id < 0 || tribe_id < 0)
+    {
+        return VOTES_INVALID_ID;
+    }
+    int tribe_num = voteTribeContain(vote,tribe_id);
+    if(tribe_num == -1)
+    {
+        if(voteAddTribe(vote,tribe_id) == VOTES_OUT_OF_MEMORY)
+        {
+            return VOTES_OUT_OF_MEMORY;
+        }
+    }
+    char* str = toString(area_id);
+    if(str == NULL)
+    {
+        free(str);
+        return VOTES_OUT_OF_MEMORY;
+    }
+    int votes_num = toInt(mapGet(vote->map_area[tribe_num], str));
+    free(str);
+    return votes_num;
+}
