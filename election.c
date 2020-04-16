@@ -133,6 +133,7 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
     voteAdd(election->votes, tribe_id, area_id, num_of_votes); //uses function from votesADT to add votes
     return ELECTION_SUCCESS;
 }
+
 ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes)
 {
     if(election == NULL)
@@ -181,7 +182,6 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     return ELECTION_SUCCESS;
 }
 
-
 //checks if string passed is all lower case letters + spaces and returns true/false
 static bool stringValid(const char* str)
 {
@@ -197,6 +197,125 @@ static bool stringValid(const char* str)
         }
     }
     return true;
+}
+
+Election electionCreate() {
+    Election election = malloc(sizeof(*(election)));
+    if(election == NULL){
+        return NULL;
+    }
+    election->areas = mapCreate();
+    election->tribes = mapCreate();
+    election->votes = voteCreate();
+    if(election->areas == NULL || election->tribes == NULL || election->votes == NULL){
+        free(election->votes);
+        free(election->tribes);
+        free(election->votes);
+        free(election);
+        return NULL;
+    }
+    return election;
+}
+
+const char* electionGetTribeName (Election election, int tribe_id){
+    if(election == NULL){
+        return NULL;
+    }
+    if(tribe_id < 0){
+        return NULL;
+    }
+    char* key = toString(tribe_id);
+    if(key == NULL){
+        return NULL;
+    }
+    return mapGet(election->tribes,key);
+}
+
+ElectionResult electionSetTribeName (Election election, int tribe_id, const char* tribe_name){
+    if(election == NULL || tribe_name == NULL){
+        return ELECTION_NULL_ARGUMENT;
+    }
+    if(tribe_id < 0){
+        return ELECTION_INVALID_ID;
+    }
+    if(!stringValid(tribe_name)){
+        return ELECTION_INVALID_NAME;
+    }
+    char* tribe_key = toString(tribe_id);
+    if(tribe_key == NULL){
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    if(!(mapContains(election->tribes,tribe_key))){
+        free(tribe_key);
+        return ELECTION_TRIBE_NOT_EXIST;
+    }
+    if(mapPut(election->tribes,tribe_key,tribe_name) == MAP_OUT_OF_MEMORY){
+        free(tribe_key);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    return ELECTION_SUCCESS;
+}
+
+ElectionResult electionRemoveTribe (Election election, int tribe_id){
+    if(election == NULL){
+        return ELECTION_NULL_ARGUMENT;
+    }
+    if(tribe_id < 0){
+        return ELECTION_INVALID_ID;
+    }
+    char* tribe_key = toString(tribe_id);
+    if(tribe_key == NULL){
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    if(!mapContains(election->tribes,tribe_key)){
+        free(tribe_key);
+        return ELECTION_TRIBE_NOT_EXIST;
+    }
+    mapRemove(election->tribes,tribe_key); //removing the tribe from the tribe-map
+    voteRemoveTribe(election->votes,tribe_id); // removing the tribe from the tribe-vote
+    free(tribe_key);
+    return ELECTION_SUCCESS;
+}
+
+ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area){
+    if(election == NULL || should_delete_area == NULL){
+        return ELECTION_NULL_ARGUMENT;
+    }
+    bool isAreaRemoved = true;
+    while (isAreaRemoved) { //checking if we removed any area
+        isAreaRemoved = false;
+        char *area_key = mapGetFirst(election->areas);
+        while (area_key) { //looking for area to remove
+            if (should_delete_area(toInt(area_key))) {
+                mapRemove(election->areas, area_key);//removing the tribe from the tribe-map
+                voteRemoveArea(election->votes, toInt(area_key));// removing the tribe from the tribe-vote
+                isAreaRemoved = true;
+                break; //if area is remove the last area replace is place so the iterator will miss him so we start the loop from the start
+            }
+            area_key = mapGetNext(election->areas);
+        }
+    }
+    return ELECTION_SUCCESS;
+}
+
+Map electionComputeAreasToTribesMapping (Election election){
+    if(election == NULL){
+        return NULL;
+    }
+    Map map = mapCreate();
+    if(map == NULL){
+        return NULL;
+    }
+    if(mapGetFirst(election->tribes) == NULL || mapGetFirst(election->areas) == NULL){
+        return map;
+    }
+    char* area_id_str = mapGetFirst(election->areas);
+    while(area_id_str) {
+        char* most_voted_tribe = voteMostVoted(election->votes,area_id_str);
+        mapPut(map,area_id_str,most_voted_tribe);
+        area_id_str = mapGetNext(election->areas);
+    }
+    return map;
 }
 
 static char* toString(int num){
@@ -219,6 +338,9 @@ static char* toString(int num){
 
 static int toInt(char* str)
 {
+    if(str == NULL){
+        return -1;
+    }
     int len = strlen(str);
     int num = 0;
     for (int j = 0; j < len; ++j) {

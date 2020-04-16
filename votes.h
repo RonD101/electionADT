@@ -45,5 +45,6 @@ static int toInt(char* str);
 
 static VoteResult expand(Votes map);
 
+char* voteMostVoted(Votes vote, char* area_id_str);
 
 #endif //ELECTIONADT_VOTES_H

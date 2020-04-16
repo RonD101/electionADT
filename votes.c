@@ -148,6 +148,9 @@ static char* toString(int num){
 
 static int toInt(char* str)
 {
+    if(str == NULL){
+        return -1;
+    }
     int len = strlen(str);
     int num = 0;
     for (int j = 0; j < len; ++j) {
@@ -173,9 +176,6 @@ VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int 
     if(tribe_id < 0 || area_id < 0){
         return VOTES_INVALID_ID;
     }
-    if(votes_num < 0){
-        return VOTES_INVALID_VOTES;
-    }
     int tribe_num = voteTribeContain(vote, tribe_id);
     if(tribe_num != -1){
         char* key = toString(area_id);
@@ -193,12 +193,18 @@ VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int 
             free(key);
             return VOTES_SUCCESS;
         }else{//creating a new area for this tribe
+            if(votes_num < 0){
+                return VOTES_INVALID_VOTES;
+            }
             if(voteAddArea(vote,area_id,tribe_id,votes_num) == VOTES_OUT_OF_MEMORY){
                 return VOTES_OUT_OF_MEMORY;
             }
             return VOTES_SUCCESS;
         }
     } else{//creating a new tribe and area with associated number of votes
+        if(votes_num < 0){
+            return VOTES_INVALID_VOTES;
+        }
         if(vote->size == vote->maxSize){
             if(expand(vote) == VOTES_OUT_OF_MEMORY){
                 return VOTES_OUT_OF_MEMORY;
@@ -230,6 +236,32 @@ static VoteResult expand(Votes vote){
     vote->maxSize = newSize;
     return VOTES_SUCCESS;
 }
+
+char* voteMostVoted(Votes vote, char* area_id_str){
+    if(vote == NULL || area_id_str == NULL){
+        return NULL;
+    }
+    int most_num_of_votes = 0;
+    char* mostVotedTribe = NULL;
+    int votes_num;
+    for (int i = 0; i < vote->size; ++i) {
+        votes_num = toInt(mapGet(vote->map_area[i],area_id_str)); // checking how many voted to this tribe in this area
+        if(votes_num == -1){// vote_num is equal to -1 when no one voted for this tribe so we updating it to 0
+            votes_num = 0;
+        }
+        if(votes_num > most_num_of_votes){ //updating the most voted number and it's name
+            most_num_of_votes = votes_num;
+            mostVotedTribe = vote->tribes[i];
+        } else if(votes_num == most_num_of_votes){ //dealing with the case of the same number of vote and choosing the lower id.
+            if(toInt(vote->tribes[i]) < toInt(mostVotedTribe)){
+                most_num_of_votes = votes_num;
+                mostVotedTribe = vote->tribes[i];
+            }
+        }
+    }
+    return mostVotedTribe;
+}
+
 
 
 int voteNumOfVotes(Votes vote, int area_id, int tribe_id)
