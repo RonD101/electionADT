@@ -22,8 +22,9 @@ struct Map_t{
 
 Map mapCreate(){
     Map new_map = malloc(sizeof(*new_map));
-    if (new_map == NULL)
+    if (new_map == NULL) {
         return NULL;
+    }
     new_map->key = malloc(INITIAL_SIZE * sizeof(char*));
     new_map->value = malloc(INITIAL_SIZE * sizeof(char*));
     if(new_map->key == NULL || new_map->value == NULL){ //checking id any of the malloc failed
@@ -42,8 +43,9 @@ Map mapCopy(Map map){
         return NULL;
     }
     Map newMap = mapCreate();
-    if(newMap == NULL)
+    if(newMap == NULL) {
         return NULL;
+    }
     while (map->maxSize != newMap->maxSize){ //expanding the new map to the original map size
         if(expand(newMap) == MAP_OUT_OF_MEMORY){
             mapDestroy(newMap);
@@ -65,8 +67,9 @@ Map mapCopy(Map map){
 }
 
 int mapGetSize(Map map){
-    if(map == NULL)
+    if(map == NULL) {
         return -1;
+    }
     return map->size;
 }
 
@@ -132,7 +135,7 @@ void mapDestroy(Map map)
 char* mapGetNext(Map map)
 {
     //if reached end of map or if map argument is NULL return NULL
-    if(map->iterator >= map->size || map == NULL)
+    if(map == NULL || map->iterator >= map->size)
     {
         return NULL;
     }
@@ -155,8 +158,6 @@ char* mapGet(Map map, const char* key){
     if(map == NULL || key == NULL){
         return NULL;
     }
-    //assert((int)map != (int)(0xe000000000000000));
-    //printf("%d\n",(int)(map->size));
     for (int i = 0; i < map->size; ++i) { //searching for the key in map
         if(strcmp(map->key[i],key) == 0){
             return map->value[i];
