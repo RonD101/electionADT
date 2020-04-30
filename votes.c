@@ -12,6 +12,9 @@
 #define LAST_DIGIT 10
 #define FIRST_NUMBER '0'
 
+static char* toString(int num);
+static int toInt(char* str);
+
 struct votes_t{
     char **tribes;
     Map *map_area;
@@ -26,8 +29,10 @@ void voteDestroy(Votes vote)
         for(int i = 0; i < vote->size; i++)
         {
             mapDestroy(vote->map_area[i]); //uses mapADT function to destroy each area
+            free(vote->tribes[i]); //deallocates memory from tribes
         }
-        free(vote->tribes); //deallocates memory from tribes
+        free(vote->tribes);
+        free(vote->map_area);
         free(vote); //deallocates memory from the vote struct
     }
 }
@@ -62,10 +67,22 @@ VoteResult voteAddArea(Votes vote, int area_id, int tribe_id,int votes_num){
         if(voteAddTribe(vote,tribe_id) == VOTES_OUT_OF_MEMORY){
             return VOTES_OUT_OF_MEMORY;
         }
+        tribe_num = voteTribeContain(vote,tribe_id);
     }
-    if(mapPut(vote->map_area[tribe_num],toString(area_id),toString(votes_num)) == MAP_OUT_OF_MEMORY){
+    char* area_str = toString(area_id);
+    char* vote_num_str = toString(votes_num);
+    if(area_str == NULL || vote_num_str == NULL){
+        free(area_str);
+        free(vote_num_str);
         return VOTES_OUT_OF_MEMORY;
     }
+    if(mapPut(vote->map_area[tribe_num],area_str,vote_num_str) == MAP_OUT_OF_MEMORY){
+        free(area_str);
+        free(vote_num_str);
+        return VOTES_OUT_OF_MEMORY;
+    }
+    free(area_str);
+    free(vote_num_str);
     return VOTES_SUCCESS;
 }
 
@@ -83,11 +100,18 @@ VoteResult voteAddTribe(Votes vote, int tribe_id)
     {
         return VOTES_TRIBE_ALREADY_EXIST;
     }
-    assert(vote->size < vote->maxSize);
+    //assert(vote->size <= vote->maxSize);
+    if(vote->size >= vote->maxSize){
+        if(voteExpand(vote) == VOTES_OUT_OF_MEMORY){
+            return VOTES_OUT_OF_MEMORY;
+        }
+    }
     vote->tribes[vote->size] = toString(tribe_id);
+    vote->map_area[vote->size] = mapCreate();
+    if(vote->map_area[vote->size] == NULL){
+        return VOTES_OUT_OF_MEMORY;
+    }
     vote->size++;
-    //vote->tribes[vote->size++] = malloc(strlen(toString(tribe_id)));
-    //vote->tribes[vote->size] = toString(tribe_id);
     return VOTES_SUCCESS;
 }
 
@@ -169,7 +193,7 @@ int voteTribeContain(Votes vote, int tribe_id){
     return -1;
 }
 
-VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int votes_num){
+VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, int votes_num){
     if(vote == NULL){
         return VOTES_NULL_ARGUMENT;
     }
@@ -184,8 +208,12 @@ VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int 
         }
         if(mapGet(vote->map_area[tribe_num], key) != NULL){//updating the amount of votes
             int new_vote_value = toInt(mapGet(vote->map_area[tribe_num], key)) + votes_num;
+            if(new_vote_value < 0){
+                new_vote_value = 0;
+            }
             char* new_vote_value_str = toString(new_vote_value);
             if(new_vote_value_str == NULL){
+                free(key);
                 return VOTES_OUT_OF_MEMORY;
             }
             mapPut(vote->map_area[tribe_num],key,new_vote_value_str);
@@ -193,6 +221,7 @@ VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int 
             free(key);
             return VOTES_SUCCESS;
         }else{//creating a new area for this tribe
+            free(key);
             if(votes_num < 0){
                 return VOTES_INVALID_VOTES;
             }
@@ -203,10 +232,10 @@ VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int 
         }
     } else{//creating a new tribe and area with associated number of votes
         if(votes_num < 0){
-            return VOTES_INVALID_VOTES;
+            votes_num = 0;
         }
         if(vote->size == vote->maxSize){
-            if(expand(vote) == VOTES_OUT_OF_MEMORY){
+            if(voteExpand(vote) == VOTES_OUT_OF_MEMORY){
                 return VOTES_OUT_OF_MEMORY;
             }
         }
@@ -221,7 +250,7 @@ VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, const int 
     }
 }
 
-static VoteResult expand(Votes vote){
+VoteResult voteExpand(Votes vote){
     int newSize = EXPAND_FACTOR * vote->maxSize;
     char **new_tribes = realloc(vote->tribes,sizeof(char*)*newSize);
     Map *new_map_area = realloc(vote->map_area, sizeof(Map)*newSize);
@@ -253,7 +282,7 @@ char* voteMostVoted(Votes vote, char* area_id_str){
             most_num_of_votes = votes_num;
             mostVotedTribe = vote->tribes[i];
         } else if(votes_num == most_num_of_votes){ //dealing with the case of the same number of vote and choosing the lower id.
-            if(toInt(vote->tribes[i]) < toInt(mostVotedTribe)){
+            if(toInt(vote->tribes[i]) < toInt(mostVotedTribe) || toInt(mostVotedTribe) == -1){
                 most_num_of_votes = votes_num;
                 mostVotedTribe = vote->tribes[i];
             }

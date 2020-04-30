@@ -33,6 +33,7 @@ void electionDestroy(Election election)
         mapDestroy(election->areas);
         mapDestroy(election->tribes);
         voteDestroy(election->votes);
+        free(election);
     }
 }
 
@@ -58,6 +59,7 @@ ElectionResult electionAddTribe(Election election, int tribe_id, const char* tri
     }
     if(mapContains(election->tribes, str))
     {
+        free(str);
         return ELECTION_TRIBE_ALREADY_EXIST;
     }
     mapPut(election->tribes, str, tribe_name); //adds tribe
@@ -85,8 +87,9 @@ ElectionResult electionAddArea(Election election, int area_id, const char* area_
         free(str);
         return ELECTION_OUT_OF_MEMORY;
     }
-    if(mapContains(election->tribes, str))
+    if(mapContains(election->areas, str))
     {
+        free(str);
         return ELECTION_AREA_ALREADY_EXIST;
     }
     mapPut(election->areas, str, area_name); //adds area
@@ -116,6 +119,7 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
     }
     if(!(mapContains(election->areas, str)))
     {
+        free(str);
         return ELECTION_AREA_NOT_EXIST;
     }
     free(str);
@@ -127,6 +131,7 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
     }
     if(!(mapContains(election->tribes, str)))
     {
+        free(str);
         return ELECTION_TRIBE_NOT_EXIST;
     }
     free(str);
@@ -156,6 +161,7 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     }
     if(!(mapContains(election->areas, str)))
     {
+        free(str);
         return ELECTION_AREA_NOT_EXIST;
     }
     free(str);
@@ -167,6 +173,7 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     }
     if(!(mapContains(election->tribes, str)))
     {
+        free(str);
         return ELECTION_TRIBE_NOT_EXIST;
     }
     free(str);
@@ -188,7 +195,7 @@ static bool stringValid(const char* str)
     int len = strlen(str);
     for(int i = 0; i < len; i++)
     {
-        if(!(str[i] > FIRST_LOWER_CASE_LETTER && str[i] < LAST_LOWER_CASE_LETTER))
+        if(!(str[i] >= FIRST_LOWER_CASE_LETTER && str[i] <= LAST_LOWER_CASE_LETTER))
         {
             if(str[i] != SPACE)
             {
@@ -217,7 +224,7 @@ Election electionCreate() {
     return election;
 }
 
-const char* electionGetTribeName (Election election, int tribe_id){
+char* electionGetTribeName (Election election, int tribe_id){
     if(election == NULL){
         return NULL;
     }
@@ -228,7 +235,19 @@ const char* electionGetTribeName (Election election, int tribe_id){
     if(key == NULL){
         return NULL;
     }
-    return mapGet(election->tribes,key);
+    char* tribe_name = mapGet(election->tribes,key);
+    if(tribe_name == NULL){
+        free(key);
+        return NULL;
+    }
+    char* str= malloc(strlen(tribe_name)+1);
+    if(str == NULL){
+        free(key);
+        return NULL;
+    }
+    strcpy(str,tribe_name);
+    free(key);
+    return str;
 }
 
 ElectionResult electionSetTribeName (Election election, int tribe_id, const char* tribe_name){
@@ -253,6 +272,7 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
         free(tribe_key);
         return ELECTION_OUT_OF_MEMORY;
     }
+    free(tribe_key);
     return ELECTION_SUCCESS;
 }
 

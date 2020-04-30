@@ -19,30 +19,31 @@ typedef enum ElectionResult_t {
     ELECTION_AREA_ALREADY_EXIST,
     ELECTION_TRIBE_NOT_EXIST,
     ELECTION_AREA_NOT_EXIST,
-    ELECTION_INVALID_VOTES
+    ELECTION_INVALID_VOTES,
+    ELECTION_ERROR
 } ElectionResult;
 
 typedef bool (*AreaConditionFunction) (int);
 
-Election electionCreate();//voteCreate
+Election electionCreate();
 
-void electionDestroy(Election election);//voteDestroy
+void electionDestroy(Election election);
 
-ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name);//voteAddTribe
+ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name);
 
-ElectionResult electionAddArea(Election election, int area_id, const char* area_name);//voteAddArea
+ElectionResult electionAddArea(Election election, int area_id, const char* area_name);
 
-const char* electionGetTribeName (Election election, int tribe_id);
+char* electionGetTribeName (Election election, int tribe_id);
 
-ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes);//voteAdd
+ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes);
 
-ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes);//voteAdd(-1 num_of_votes)
+ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes);
 
 ElectionResult electionSetTribeName (Election election, int tribe_id, const char* tribe_name);
 
-ElectionResult electionRemoveTribe (Election election, int tribe_id);//voteRemoveTribe
+ElectionResult electionRemoveTribe (Election election, int tribe_id);
 
-ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area);//voteRemoveArea-special
+ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area);
 
 Map electionComputeAreasToTribesMapping (Election election);
 
