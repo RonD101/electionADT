@@ -62,7 +62,7 @@ ElectionResult electionAddTribe(Election election, int tribe_id, const char* tri
         return ELECTION_TRIBE_ALREADY_EXIST;
     }
     mapPut(election->tribes, str, tribe_name); //adds tribe
-    //free(str);
+    free(str);
     return ELECTION_SUCCESS;
 }
 
