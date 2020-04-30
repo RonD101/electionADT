@@ -108,7 +108,9 @@ VoteResult voteAddTribe(Votes vote, int tribe_id)
     }
     vote->tribes[vote->size] = toString(tribe_id);
     vote->map_area[vote->size] = mapCreate();
-    if(vote->map_area[vote->size] == NULL){
+    if(vote->map_area[vote->size] == NULL || vote->tribes[vote->size] == NULL){
+        mapDestroy(vote->map_area[vote->size]);
+        free(vote->tribes[vote->size]);
         return VOTES_OUT_OF_MEMORY;
     }
     vote->size++;
@@ -175,7 +177,7 @@ static int toInt(char* str)
     if(str == NULL){
         return -1;
     }
-    int len = strlen(str);
+    int len = (int)strlen(str);
     int num = 0;
     for (int j = 0; j < len; ++j) {
         num *= LAST_DIGIT;

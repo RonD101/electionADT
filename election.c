@@ -54,7 +54,6 @@ ElectionResult electionAddTribe(Election election, int tribe_id, const char* tri
     char* str = toString(tribe_id); //makes a copy of tribe_id into a string to pass to function mapContains
     if(str == NULL)
     {
-        free(str);
         return ELECTION_OUT_OF_MEMORY;
     }
     if(mapContains(election->tribes, str))
@@ -63,7 +62,7 @@ ElectionResult electionAddTribe(Election election, int tribe_id, const char* tri
         return ELECTION_TRIBE_ALREADY_EXIST;
     }
     mapPut(election->tribes, str, tribe_name); //adds tribe
-    free(str);
+    //free(str);
     return ELECTION_SUCCESS;
 }
 
@@ -215,9 +214,9 @@ Election electionCreate() {
     election->tribes = mapCreate();
     election->votes = voteCreate();
     if(election->areas == NULL || election->tribes == NULL || election->votes == NULL){
-        free(election->votes);
-        free(election->tribes);
-        free(election->votes);
+        mapDestroy(election->areas);
+        mapDestroy(election->tribes);
+        voteDestroy(election->votes);
         free(election);
         return NULL;
     }
@@ -361,7 +360,7 @@ static int toInt(char* str)
     if(str == NULL){
         return -1;
     }
-    int len = strlen(str);
+    int len = (int)strlen(str);
     int num = 0;
     for (int j = 0; j < len; ++j) {
         num *= LAST_DIGIT;
