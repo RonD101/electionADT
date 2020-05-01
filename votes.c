@@ -6,6 +6,7 @@
 #include "mtm_map/map.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 
 #define INITIAL_SIZE 2
 #define EXPAND_FACTOR 2
@@ -100,7 +101,6 @@ VoteResult voteAddTribe(Votes vote, int tribe_id)
     {
         return VOTES_TRIBE_ALREADY_EXIST;
     }
-    //assert(vote->size <= vote->maxSize);
     if(vote->size >= vote->maxSize){
         if(voteExpand(vote) == VOTES_OUT_OF_MEMORY){
             return VOTES_OUT_OF_MEMORY;

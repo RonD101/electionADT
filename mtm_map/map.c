@@ -28,8 +28,11 @@ Map mapCreate(){
     new_map->key = malloc(INITIAL_SIZE * sizeof(char*));
     new_map->value = malloc(INITIAL_SIZE * sizeof(char*));
     if(new_map->key == NULL || new_map->value == NULL){ //checking id any of the malloc failed
+        //printf("key = %d\n", (int)sizeof(new_map->key));
         free(new_map->key);
+        //printf("value = %d\n", (int)sizeof(new_map->value));
         free(new_map->value);
+        //printf("newmap = %d\n", (int)sizeof(new_map));
         free(new_map);
         return NULL;
     }
@@ -92,13 +95,15 @@ MapResult mapRemove(Map map, const char* key)
     {
         i--;
         free(map->key[i]);
-        map->key[i] = NULL;
+        //map->key[i] = NULL;
         free(map->value[i]);
-        map->value[i] = NULL;
+        //map->value[i] = NULL;
         //puts elements from end of map to where index was for removal
         if(map->size != 1){
             map->key[i] = map->key[map->size-1];
             map->value[i] = map->value[map->size-1];
+            map->key[map->size-1] = NULL;
+            map->value[map->size-1] = NULL;
         }
         map->size--; //reduce map size by one once element is removed
         return MAP_SUCCESS;
@@ -159,6 +164,7 @@ char* mapGet(Map map, const char* key){
         return NULL;
     }
     for (int i = 0; i < map->size; ++i) { //searching for the key in map
+        //printf("%s\n",map->key[i]);
         if(strcmp(map->key[i],key) == 0){
             return map->value[i];
         }
@@ -183,6 +189,7 @@ MapResult mapPut(Map map, const char* key, const char* data){
     if(mapContains(map,key)){ //check if key exist then update value
         int keyIndex = mapGetIndex(map,key);
         char* new_value = realloc(map->value[keyIndex],strlen(data)+1);
+        //printf("%d",(int)sizeof(*new_value));
         if(new_value == NULL){
             return MAP_OUT_OF_MEMORY;
         }
@@ -197,6 +204,8 @@ MapResult mapPut(Map map, const char* key, const char* data){
         }
         map->key[map->size] = malloc(sizeof(strlen(key))+1);
         map->value[map->size] = malloc(sizeof(strlen(data))+1);
+        //printf("%lu\n",sizeof(strlen(key))+1);
+        //printf("%lu\n",sizeof(strlen(data))+1);
         if(map->value[map->size] == NULL || map->key[map->size] == NULL){
             free(map->value[map->size]);
             map->value[map->size] = NULL;

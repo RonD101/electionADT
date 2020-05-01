@@ -7,6 +7,7 @@
 #include "votes.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define LAST_DIGIT 10
 #define FIRST_NUMBER '0'
@@ -113,7 +114,6 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
     char* str = toString(area_id); //makes a copy of area_id into a string to pass to function mapContains
     if(str == NULL)
     {
-        free(str);
         return ELECTION_OUT_OF_MEMORY;
     }
     if(!(mapContains(election->areas, str)))
@@ -125,7 +125,6 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
     str = toString(tribe_id); //makes a copy of tribe_id into a string to pass to function mapContains
     if(str == NULL)
     {
-        free(str);
         return ELECTION_OUT_OF_MEMORY;
     }
     if(!(mapContains(election->tribes, str)))
@@ -155,7 +154,6 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     char* str = toString(area_id); //makes a copy of area_id into a string to pass to function mapContains
     if(str == NULL)
     {
-        free(str);
         return ELECTION_OUT_OF_MEMORY;
     }
     if(!(mapContains(election->areas, str)))
@@ -167,7 +165,6 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     str = toString(tribe_id); //makes a copy of tribe_id into a string to pass to function mapContains
     if(str == NULL)
     {
-        free(str);
         return ELECTION_OUT_OF_MEMORY;
     }
     if(!(mapContains(election->tribes, str)))
