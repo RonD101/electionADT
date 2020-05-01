@@ -188,7 +188,7 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
 //checks if string passed is all lower case letters + spaces and returns true/false
 static bool stringValid(const char* str)
 {
-    int len = strlen(str);
+    int len = (int)strlen(str);
     for(int i = 0; i < len; i++)
     {
         if(!(str[i] >= FIRST_LOWER_CASE_LETTER && str[i] <= LAST_LOWER_CASE_LETTER))
@@ -236,7 +236,7 @@ char* electionGetTribeName (Election election, int tribe_id){
         free(key);
         return NULL;
     }
-    char* str= malloc(strlen(tribe_name)+1);
+    char* str= malloc((strlen(tribe_name)+1)* sizeof(char));
     if(str == NULL){
         free(key);
         return NULL;
@@ -301,10 +301,11 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
     while (isAreaRemoved) { //checking if we removed any area
         isAreaRemoved = false;
         char *area_key = mapGetFirst(election->areas);
+        //int area_id_int = toInt(area_key);
         while (area_key) { //looking for area to remove
             if (should_delete_area(toInt(area_key))) {
-                mapRemove(election->areas, area_key);//removing the tribe from the tribe-map
                 voteRemoveArea(election->votes, toInt(area_key));// removing the tribe from the tribe-vote
+                mapRemove(election->areas, area_key);//removing the tribe from the tribe-map
                 isAreaRemoved = true;
                 break; //if area is remove the last area replace is place so the iterator will miss him so we start the loop from the start
             }
@@ -340,7 +341,7 @@ static char* toString(int num){
         counter++;
         temp /= LAST_DIGIT;
     }
-    char *str = malloc(sizeof(char)*counter + 1);
+    char *str = malloc((sizeof(char)*counter + 1)* sizeof(char));
     if(str == NULL){
         return NULL;
     }
