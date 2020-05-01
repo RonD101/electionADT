@@ -1,277 +1,243 @@
-/* ----------------------------------------------------------------------------
-                        Random Key Tester - map.c
-This tester will generate random VALID keys and values, and run random tests
-with them by using different map.c functions. Please compile with 'map.c', and
-make sure the test file is located in the 'tests' folder. For best feedback
-the test should be run by valgrind, and use the compilation flags noted in the
-assignment pdf file.
-And for the sake of our server, and for your own, DO NOT EXCEED 100 tests - it
-will take forever and put a strain on poor csl3. Enjoy!
-------------------------------------------------------------------------------*/
-
-#include <time.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <assert.h>
-#include <string.h>
-//#include "../mtm_map/map.h"
-#include "mtm_map/map.h"
+#include "../election.h"
+#include "../test_utilities.h"
 
-#define KEY_LEN 10
-#define VAL_LEN 20
-#define KEY_OPTIONS 10
-#define VAL_OPTIONS 27
-#define STRING_END '\0'
-#define TEST_OPTIONS 3
-#define NUM_OF_TESTS 1
-#define MAX_ERROR_NAME_LEN 25
+/*The number of tests*/
+#define NUMBER_TESTS 10
+#define MAX_STR_LEN 20 //Must be greater than 1
+#define MAX_VOTES 100 //Must be greater than 1
+#define NUM_OF_AREAS 30 //Do not lower beneath 12
+#define NUM_OF_TRIBES 50 //Do not lower beneath 12
 
-void randomizeKey(char* key);
-void randomizeVal(char* val);
-void runMapRandomTest(Map map, char* key, char* val, FILE* log_file);
-MapResult runMapPutTest(Map map, char* key, char* val, FILE* log_file);
-MapResult runMapCopyTest(Map map, char* key, FILE* log_file);
-MapResult runMapRemoveTest(Map map, char* key, char* val, FILE* log_file);
-void printMapErrorMessage(const char* func_name, const char* key, const char* val, MapResult error, FILE* log_file);
-void printMemoryError(const char* func_name, FILE* log_file);
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
+#define FIRST_TRIBE 3
+#define SECOND_TRIBE 4
+#define THIRD_TRIBE 5
+#define FIRST_AREA 1
+#define SECOND_AREA 2
+#define THIRD_AREA 3
+#define FOURTH_AREA 404
 
-int main(){
+static char *rand_string(char *str, size_t size)
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyz ";
+    if (size)
+    {
+        --size;
+        for (size_t n = 0; n < size; n++)
+        {
+            srand(time(NULL)*n);
+            int key = rand() % (int) (sizeof charset - 1);
+            str[n] = charset[key];
+        }
+        str[size] = '\0';
+    }
+    return str;
+}
 
-    FILE* log_file = fopen("testlog.txt", "a");
-    if(log_file == NULL){
-        printf("Log file could not be open. Exiting...");
+static int rand_int(int max)
+{
+    int res = 0;
+    static int feed = 251640;
+    srand(time(NULL)*(++feed));
+    res = (rand()*feed) % (max + 1);
+    return abs(res);
+}
+
+bool deleteOnlyFirstArea(int area_id) {
+    return area_id == 1;
+}
+
+bool deleteEvenNumberAreas(int area_id)
+{
+    return !(area_id % 2);
+}
+
+bool deleteAllAreas(int area_id)
+{
+    return area_id >= 0;
+}
+
+bool testElectionRemoveAreas() {
+    Election election = electionCreate();
+    ASSERT_TEST(electionAddArea(election, FIRST_AREA, "first area") == ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddArea(election, SECOND_AREA, "second area") == ELECTION_SUCCESS);
+    ASSERT_TEST(electionRemoveAreas(election, deleteOnlyFirstArea) == ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddArea(election, SECOND_AREA, "second area") == ELECTION_AREA_ALREADY_EXIST);
+    ASSERT_TEST(electionAddArea(election, 3, "THIRD ") == ELECTION_INVALID_NAME);
+    electionDestroy(election);
+    return true;
+}
+bool testElectionRemoveAddtribe()
+{
+    Election election = electionCreate();
+    ASSERT_TEST(electionAddTribe(election, FIRST_TRIBE, "first tribe") == ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddTribe(election, SECOND_TRIBE, "second tribe") == ELECTION_SUCCESS);
+    ASSERT_TEST(electionSetTribeName(election, FIRST_TRIBE , "first") == ELECTION_SUCCESS);
+    char *name = NULL;
+    ASSERT_TEST((name = electionGetTribeName(election, 4)) != NULL);
+    ASSERT_TEST(strcmp(name, "second tribe") == 0);
+    free(name);
+    ASSERT_TEST(electionSetTribeName(election, 2, "first") == ELECTION_TRIBE_NOT_EXIST);
+    ASSERT_TEST(electionRemoveTribe(election, FIRST_TRIBE) == ELECTION_SUCCESS);
+    ASSERT_TEST(electionRemoveTribe(election,FIRST_TRIBE) == ELECTION_TRIBE_NOT_EXIST);
+    ASSERT_TEST(electionSetTribeName(election, -2, "third") == ELECTION_INVALID_ID);
+    ASSERT_TEST(electionSetTribeName(election, SECOND_TRIBE, "SECOND") == ELECTION_INVALID_NAME);
+    electionDestroy(election);
+    return true;
+}
+bool  testAddRemoveVotes() {
+    Election election = electionCreate();
+    ASSERT_TEST(electionAddArea(election, FIRST_AREA, "first area") == ELECTION_SUCCESS); //create area 1
+    ASSERT_TEST(electionAddArea(election, SECOND_AREA, "second area") == ELECTION_SUCCESS); //create area 2
+    ASSERT_TEST(electionAddTribe(election, FIRST_TRIBE, "first tribe") == ELECTION_SUCCESS); //create tribe 1
+    ASSERT_TEST(electionAddTribe(election, SECOND_TRIBE, "second tribe") == ELECTION_SUCCESS); //create tribe 2
+    ASSERT_TEST(electionAddTribe(election, THIRD_TRIBE, "third tribe") == ELECTION_SUCCESS); //create tribe 3
+    ASSERT_TEST(electionAddVote(election,FIRST_AREA, FIRST_TRIBE, 10) == ELECTION_SUCCESS); //+10 votes: area 1->tribe 1
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA,SECOND_TRIBE, 14) == ELECTION_SUCCESS); //+14 votes: area 1->tribe 2
+    ASSERT_TEST(electionAddVote(election, SECOND_AREA, FIRST_TRIBE, 17) == ELECTION_SUCCESS); //+17 votes: area 2->tribe 1
+    ASSERT_TEST(electionRemoveVote(election,FIRST_AREA, SECOND_TRIBE, 4) == ELECTION_SUCCESS); //-4 votes: area 1->tribe 2 :: TOTAL: 10
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA, SECOND_TRIBE, -1) == ELECTION_INVALID_VOTES);
+    ASSERT_TEST(electionAddVote(NULL, SECOND_AREA, SECOND_TRIBE, 3) == ELECTION_NULL_ARGUMENT);
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA, 7, 27) == ELECTION_TRIBE_NOT_EXIST);
+    ASSERT_TEST(electionRemoveVote(election, 9, SECOND_TRIBE,6) ==ELECTION_AREA_NOT_EXIST);
+    ASSERT_TEST(electionRemoveVote(election, FIRST_AREA,THIRD_TRIBE, 6) == ELECTION_SUCCESS); //-6 votes: area 1->tribe 3 :: TOTAL: STAYS 0
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA, THIRD_TRIBE,5) == ELECTION_SUCCESS); //+5 votes: area1->tribe3 :: TOTAL 5
+    ASSERT_TEST(electionRemoveVote(election, FIRST_AREA, THIRD_TRIBE, 30) == ELECTION_SUCCESS); //-30 votes: area1->tribe3 :: TOTAL 0
+    electionDestroy(election);
+    return true;
+}
+
+bool testComputeAreasToTribesMapping()
+{
+    Election election = electionCreate();
+    ASSERT_TEST(electionAddArea(election, FIRST_AREA, "first area") == ELECTION_SUCCESS); //create area 1
+    ASSERT_TEST(electionAddArea(election, SECOND_AREA, "second area") == ELECTION_SUCCESS); //create area 2
+    ASSERT_TEST(electionAddArea(election, THIRD_AREA, "second area") == ELECTION_SUCCESS); //create area 3
+    ASSERT_TEST(electionAddArea(election, FOURTH_AREA, "second area") == ELECTION_SUCCESS); //create area 4
+    ASSERT_TEST(electionAddTribe(election, FIRST_TRIBE, "first tribe") == ELECTION_SUCCESS); //create tribe 1
+    ASSERT_TEST(electionAddTribe(election, SECOND_TRIBE, "second tribe") == ELECTION_SUCCESS); //create tribe 2
+    ASSERT_TEST(electionAddTribe(election, THIRD_TRIBE, "third tribe") == ELECTION_SUCCESS); //create tribe 3
+    ASSERT_TEST(electionAddVote(election,FIRST_AREA, FIRST_TRIBE, 10) == ELECTION_SUCCESS); //+10 votes: area 1->tribe 1 :: TOTAL: 10
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA,SECOND_TRIBE, 14) == ELECTION_SUCCESS); //+14 votes: area 1->tribe 2 :: TOTAL: 14
+    ASSERT_TEST(electionAddVote(election, SECOND_AREA, FIRST_TRIBE, 17) == ELECTION_SUCCESS); //+17 votes: area 2->tribe 1 :: TOTAL: 17
+    ASSERT_TEST(electionRemoveVote(election,FIRST_AREA, SECOND_TRIBE, 4) == ELECTION_SUCCESS); //-4 votes: area 1->tribe 2 :: TOTAL: 10
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA, SECOND_TRIBE, -1) == ELECTION_INVALID_VOTES);
+    ASSERT_TEST(electionAddVote(NULL, SECOND_AREA, SECOND_TRIBE, 3) == ELECTION_NULL_ARGUMENT);
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA, 7, 27) == ELECTION_TRIBE_NOT_EXIST);
+    ASSERT_TEST(electionRemoveVote(election, 9, SECOND_TRIBE,6) ==ELECTION_AREA_NOT_EXIST);
+    ASSERT_TEST(electionRemoveVote(election, FIRST_AREA,THIRD_TRIBE, 6) == ELECTION_SUCCESS); //-6 votes: area 1->tribe 3 :: TOTAL: STAYS 0
+    ASSERT_TEST(electionAddVote(election, FIRST_AREA, THIRD_TRIBE,5) == ELECTION_SUCCESS); //+5 votes: area 1->tribe 3 :: TOTAL: 5
+    ASSERT_TEST(electionAddVote(election, FOURTH_AREA, SECOND_TRIBE,10) == ELECTION_SUCCESS); //+10 votes: area 4->tribe 2 :: TOTAL: 10
+    ASSERT_TEST(electionAddVote(election, FOURTH_AREA, THIRD_TRIBE,50) == ELECTION_SUCCESS); //+50 votes: area 4->tribe 3 :: TOTAL: 50
+    ASSERT_TEST(electionRemoveVote(election, FOURTH_AREA, THIRD_TRIBE,45) == ELECTION_SUCCESS); //-45 votes: area 4->tribe 3 :: TOTAL: 5
+    ASSERT_TEST(electionRemoveVote(election, FIRST_AREA, THIRD_TRIBE, 30) == ELECTION_SUCCESS); //-30 votes: area 1->tribe 3 :: TOTAL: 0
+    ASSERT_TEST(electionAddVote(election, SECOND_AREA, THIRD_TRIBE,200) == ELECTION_SUCCESS); //+200 votes: area 2->tribe 3 :: TOTAL: 200
+    /**
+     * LOWEST ID: FIRST_TRIBE
+     * MAX VOTES AREA 1: FIRST_TRIBE (same as SECOND_TRIBE)
+     * MAX VOTES AREA 2: THIRD_TRIBE
+     * MAX VOTES AREA 3: LOWEST ID
+     * MAX VOTES AREA 4: SECOND_TRIBE
+     * */
+    Map tester = NULL;
+    ASSERT_TEST((tester = electionComputeAreasToTribesMapping(election)) != NULL);
+    ASSERT_TEST(!strcmp(mapGet(tester, TOSTRING(FIRST_AREA)), TOSTRING(FIRST_TRIBE)));
+    ASSERT_TEST(!strcmp(mapGet(tester, TOSTRING(SECOND_AREA)), TOSTRING(THIRD_TRIBE)));
+    ASSERT_TEST(!strcmp(mapGet(tester, TOSTRING(THIRD_AREA)), TOSTRING(FIRST_TRIBE)));
+    ASSERT_TEST(!strcmp(mapGet(tester, TOSTRING(FOURTH_AREA)), TOSTRING(SECOND_TRIBE)));
+    mapDestroy(tester);
+
+    electionDestroy(election);
+    return true;
+}
+
+bool raiseHell()
+{
+    Election election = electionCreate();
+    char *tmp = malloc(MAX_STR_LEN + 1);
+    assert(tmp != NULL);
+    for(int i = 0; i < NUM_OF_AREAS; i++)
+    {
+        ASSERT_TEST(electionAddArea(election, i, "ooga") == ELECTION_SUCCESS);
+    }
+    for(int i = 0; i < NUM_OF_TRIBES; i++)
+    {
+        int len = rand_int(MAX_STR_LEN);
+        rand_string(tmp, len == 0? 1 : len);
+        ASSERT_TEST(electionAddTribe(election, i, tmp) == ELECTION_SUCCESS);
+    }
+    ASSERT_TEST(electionAddArea(election, NUM_OF_AREAS-1, tmp) == ELECTION_AREA_ALREADY_EXIST);
+    ASSERT_TEST(electionAddTribe(election, NUM_OF_TRIBES-1, tmp) == ELECTION_TRIBE_ALREADY_EXIST);
+    ASSERT_TEST(electionRemoveAreas(election, deleteEvenNumberAreas) == ELECTION_SUCCESS);
+    for(int i = 0; i < NUM_OF_AREAS; i += 2)
+    {
+        ASSERT_TEST(electionAddArea(election, i, "booga") == ELECTION_SUCCESS);
+    }
+    int id1 = rand_int(NUM_OF_TRIBES-1);
+    int id2 = 0;
+    ASSERT_TEST(electionRemoveTribe(election, id1) == ELECTION_SUCCESS);
+    for(int i = 0; i < NUM_OF_AREAS; i++)
+    {
+        do
+        {
+            id2 = rand_int(NUM_OF_TRIBES-1);
+        } while (id2 == id1);
+        ASSERT_TEST(electionAddVote(election, i, id2,rand_int(MAX_VOTES) + 1) == ELECTION_SUCCESS);
+    }
+    Map statistics1, statistics2;
+    ASSERT_TEST((statistics1 = electionComputeAreasToTribesMapping(election)) != NULL);
+    ASSERT_TEST(electionAddTribe(election, id1, tmp) == ELECTION_SUCCESS);
+    ASSERT_TEST(electionRemoveAreas(election, deleteAllAreas) == ELECTION_SUCCESS);
+    ASSERT_TEST((statistics2 = electionComputeAreasToTribesMapping(election)) != NULL);
+    ASSERT_TEST(mapGetFirst(statistics2) == NULL);
+    mapDestroy(statistics1);
+    mapDestroy(statistics2);
+    electionDestroy(election);
+    free(tmp);
+    return true;
+}
+
+/*The functions for the tests should be added here*/
+bool (*tests[]) (void) = {
+        testElectionRemoveAreas,
+        testElectionRemoveAddtribe,
+        testAddRemoveVotes,
+        testComputeAreasToTribesMapping,
+        raiseHell
+};
+
+/*The names of the test functions should be added here*/
+const char* testNames[] = {
+        "testElectionRemoveAreas",
+        "testElectionRemoveAddtribe",
+        "testAddRemoveVotes",
+        "testComputeAreasToTribesMapping",
+        "raiseHell"
+};
+
+int main(int argc, char* argv[]) {
+    if (argc == 1) {
+        for (int test_idx = 0; test_idx < NUMBER_TESTS; test_idx++) {
+            RUN_TEST(tests[test_idx], testNames[test_idx]);
+        }
         return 0;
     }
-    char *key = calloc((KEY_LEN + 1), sizeof(char));
-    if(key == NULL){
-        printMemoryError("main", log_file);
-        return 0;
-    }
-    char *val = calloc((VAL_LEN + 1), sizeof(char));
-    if(val == NULL){
-        printMemoryError("main", log_file);
-        free(key);
-        return 0;
-    }
-    Map map = mapCreate();
-    if(map == NULL){
-        printMemoryError("main", log_file);
+    if (argc != 2) {
+        fprintf(stdout, "Usage: election <test index>\n");
         return 0;
     }
 
-    time_t t;
-    time(&t);
-    unsigned int seed = time(0);
-    srand(seed);
-
-    printf("Running all tests, please be patient.\n");
-    fprintf(log_file, "\n\n*************************************************************\n");
-    fprintf(log_file, "\tTest date and time: %s", ctime(&t));
-    fprintf(log_file, "*************************************************************\n\n");
-    fprintf(log_file, "Srand() seed: %d\n", seed); // for recreation purposes
-
-    for(int i=0; i<NUM_OF_TESTS; i++){
-        printf("Main loop: [%d of %d]\r", i+1, NUM_OF_TESTS);
-        runMapRandomTest(map, key, val, log_file);
-        mapClear(map); // Clear map after every NUM_OF_TESTS tests to avoid memory filling
+    int test_idx = strtol(argv[1], NULL, 10);
+    if (test_idx < 1 || test_idx > NUMBER_TESTS) {
+        fprintf(stderr, "Invalid test index %d\n", test_idx);
+        return 0;
     }
 
-    free(key);
-    free(val);
-    mapDestroy(map);
-    printf("\nTest complete. Please check \"testlog.txt\" for more information.\n");
-    printf("If you can't see anything in the file, you made it (at least error-wise)!\nPress any key to exit...\n");
-    fclose(log_file);
-    getchar();
+    RUN_TEST(tests[test_idx - 1], testNames[test_idx - 1]);
     return 0;
-}
-
-void randomizeKey(char* key){
-    char key_possible_chars[KEY_OPTIONS] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    int random_len = rand() % KEY_LEN + 1;
-
-    for(int i=0; i<random_len; i++){
-        int random_index = rand() % KEY_OPTIONS;
-        key[i] = key_possible_chars[random_index];
-    }
-    key[random_len] = STRING_END;
-}
-
-void randomizeVal(char* val){
-    char val_possible_chars[VAL_OPTIONS] = {' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', \
-                                            'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', \
-                                            't', 'u', 'v', 'w', 'x', 'y', 'z'};
-    int random_len = rand() % VAL_LEN + 1;
-
-    for(int i=0; i<random_len; i++){
-        int random_index = rand() % VAL_OPTIONS;
-        val[i] = val_possible_chars[random_index];
-    }
-    val[random_len] = STRING_END;
-}
-
-void runMapRandomTest(Map map, char* key, char* val, FILE* log_file){
-    int test;
-    MapResult result;
-    randomizeKey(key);
-    randomizeVal(val);
-    for(int i=0; i<NUM_OF_TESTS; i++){
-        test = 0;//rand() % TEST_OPTIONS;
-        switch(test){
-            case 0:
-                result = runMapPutTest(map, key, val, log_file); //put random keys and values inside, make sure they are identical to the input. Also tests mapContains and mapGet.
-                break;
-            case 1:
-                result = runMapCopyTest(map, key, log_file); //create maps, copy into them, compare and destroy
-                break;
-            case 2:
-                result = runMapRemoveTest(map, key, val, log_file); //put keys in a map, and make sure mapRemove is removing all of them.
-                break;
-        }
-        if(result != MAP_SUCCESS){
-            break;
-        }
-    }
-}
-
-MapResult runMapPutTest(Map map, char* key, char* val, FILE* log_file) {
-    assert(map && key && val);
-    MapResult result = MAP_SUCCESS;
-    for (int i = 0; i < NUM_OF_TESTS; i++) {
-        int case_value = rand() % 2;
-        switch (case_value) {
-            case 0:
-                randomizeKey(key);
-                randomizeVal(val);
-                break;
-            case 1:
-                randomizeVal(val);
-                break;
-        }
-
-        result = mapPut(map, key, val);
-        if (result != MAP_SUCCESS) {
-            printMapErrorMessage("mapPut", key, val, result, log_file);
-            break;
-        }
-        if (!mapContains(map, key)) {
-            printMapErrorMessage("mapContains", key, val, MAP_ITEM_DOES_NOT_EXIST, log_file);
-            break;
-        }
-        if (strcmp(mapGet(map, key), val) != 0) {
-            printMapErrorMessage("mapGet", key, val, MAP_ERROR, log_file);
-            break;
-        }
-    }
-    return result;
-}
-
-MapResult runMapCopyTest(Map map, char* key, FILE* log_file){
-    MapResult result = MAP_SUCCESS;
-    for(int i=0; i<NUM_OF_TESTS; i++){
-        Map new_map = mapCopy(map);
-        if(new_map == NULL){
-            printMemoryError("runMapCopyTest", log_file);
-            continue;
-        }
-        char* key_iterator = mapGetFirst(map);
-        while(key_iterator != NULL){
-            if(strcmp(mapGet(map, key_iterator), mapGet(new_map, key_iterator)) != 0){
-                result = MAP_ERROR;
-                printMapErrorMessage("mapCopy", key_iterator, mapGet(map, key), result, log_file);
-                break;
-            }
-            key_iterator = mapGetNext(map);
-        }
-        mapDestroy(new_map);
-    }
-    return result;
-}
-
-MapResult runMapRemoveTest(Map map, char* key, char* val, FILE* log_file){
-    MapResult result_map;
-    MapResult result_new_map;
-
-    for(int j=0; j<NUM_OF_TESTS; j++){
-        result_map = mapClear(map);
-        if(result_map != MAP_SUCCESS){
-            printMapErrorMessage("mapClear", "", "", result_map, log_file);
-            return result_map;
-        }
-        Map new_map = mapCreate();
-        if(new_map == NULL){
-            printMemoryError("runMapRemoveTest", log_file);
-            return MAP_ERROR;
-        }
-
-        for(int i=0; i<NUM_OF_TESTS; i++){
-            randomizeKey(key);
-            randomizeVal(val);
-            result_map = mapPut(map, key, val);
-            if(result_map != MAP_SUCCESS){
-                printMapErrorMessage("mapPut", key, val, result_map, log_file);
-                break;
-            }
-            result_new_map = mapPut(new_map, key, val);
-            if(result_new_map != MAP_SUCCESS){
-                printMapErrorMessage("mapPut", key, val, result_new_map, log_file);
-                break;
-            }
-        }
-
-        if(result_new_map == MAP_SUCCESS && result_map == MAP_SUCCESS){
-            int new_map_size = mapGetSize(new_map);
-            int counter = 0;
-            char *key_iterator = mapGetFirst(map);
-            while(key_iterator != NULL){
-                result_new_map = mapRemove(new_map, key_iterator);
-                if(result_new_map != MAP_SUCCESS){
-                    printMapErrorMessage("mapRemove", "", "", result_new_map, log_file);
-                    break;
-                }
-
-                counter++;
-                if(mapGetSize(new_map) != (new_map_size - counter)){
-                    printMapErrorMessage("mapRemove", "", "", MAP_ERROR, log_file);
-                    break;
-                }
-                key_iterator = mapGetNext(map);
-            }
-        }
-        mapDestroy(new_map);
-    }
-    return result_new_map;
-}
-
-void printMapErrorMessage(const char* func_name, const char* key, const char* val, MapResult error, FILE* log_file){
-    assert(error != MAP_SUCCESS);
-    char str[MAX_ERROR_NAME_LEN] = {0};
-    switch(error){
-        case MAP_SUCCESS:
-            strcpy(str, "MAP_SUCCESS");
-            break;
-        case MAP_OUT_OF_MEMORY:
-            strcpy(str, "MAP_OUT_OF_MEMORY");
-            break;
-        case MAP_NULL_ARGUMENT:
-            strcpy(str, "MAP_NULL_ARGUMENT");
-            break;
-        case MAP_ITEM_ALREADY_EXISTS:
-            strcpy(str, "MAP_ITEM_ALREADY_EXISTS");
-            break;
-        case MAP_ITEM_DOES_NOT_EXIST:
-            strcpy(str, "MAP_ITEM_DOES_NOT_EXIST");
-            break;
-        case MAP_ERROR:
-            strcpy(str, "MAP_ERROR");
-            break;
-    }
-    fprintf(log_file, "\n- Function: \"%s\" -> received error: \"%s\"\n", func_name, str);
-    fprintf(log_file, "\tKey used: \"%s\"\n", key);
-    fprintf(log_file, "\tValue used: \"%s\"\n", val);
-}
-
-void printMemoryError(const char* func_name, FILE* log_file){
-    fprintf(log_file, "\n- Memory allocation error occured in function: \"%s\"\n", func_name);
 }
