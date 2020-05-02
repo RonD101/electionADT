@@ -27,14 +27,12 @@ Map mapCreate(){
     }
     new_map->key = malloc(INITIAL_SIZE * sizeof(char*));
     new_map->value = malloc(INITIAL_SIZE * sizeof(char*));
-    if(new_map->key == NULL || new_map->value == NULL){ //checking id any of the malloc failed
+    if(new_map->key == NULL || new_map->value == NULL){ //checking if any of the malloc failed
         free(new_map->key);
         free(new_map->value);
         free(new_map);
         return NULL;
     }
-    //memset(new_map->key, 0, sizeof(char*)* INITIAL_SIZE);
-    //memset(new_map->value, 0, sizeof(char*)* INITIAL_SIZE);
     new_map->size = 0;
     new_map->maxSize = INITIAL_SIZE;
     return new_map;
@@ -92,11 +90,9 @@ MapResult mapRemove(Map map, const char* key)
     //if key element exists, free its data and the data associated with it
     if(cmpResult == 0)
     {
-        i--;
+        i--; //i will point to next map so we subtracting 1 from it
         free(map->key[i]);
-        //map->key[i] = NULL;
         free(map->value[i]);
-        //map->value[i] = NULL;
         //puts elements from end of map to where index was for removal
         if(map->size != 1){
             map->key[i] = map->key[map->size-1];
@@ -128,7 +124,7 @@ void mapDestroy(Map map)
 {
     if(map)
     {
-        // uses function mapClear then deallocates map elements and its data
+        // uses function mapClear then deallocate map elements and its data
         mapClear(map);
         free(map->key);
         free(map->value);
@@ -157,7 +153,6 @@ char* mapGetFirst(Map map)
     return mapGetNext(map); //returns first element in map
 }
 
-
 char* mapGet(Map map, const char* key){
     if(map == NULL || key == NULL){
         return NULL;
@@ -166,7 +161,6 @@ char* mapGet(Map map, const char* key){
         return NULL;
     }
     for (int i = 0; i < map->size; ++i) { //searching for the key in map
-        //printf("%s\n",map->key[i]);
         if(strcmp(map->key[i],key) == 0){
             return map->value[i];
         }
@@ -194,7 +188,6 @@ MapResult mapPut(Map map, const char* key, const char* data){
     if(mapContains(map,key)){ //check if key exist then update value
         int keyIndex = mapGetIndex(map,key);
         char* new_value = realloc(map->value[keyIndex],strlen(data)+1);
-        //printf("%d",(int)sizeof(*new_value));
         if(new_value == NULL){
             return MAP_OUT_OF_MEMORY;
         }
@@ -207,10 +200,9 @@ MapResult mapPut(Map map, const char* key, const char* data){
                 return MAP_OUT_OF_MEMORY;
             }
         }
+        //allocate enough space and updating key and value
         map->key[map->size] = malloc((strlen(key) + 1) * sizeof(char));
         map->value[map->size] = malloc((strlen(data) + 1) * sizeof(char));
-        //printf("%lu\n",sizeof(strlen(key))+1);
-        //printf("%lu\n",sizeof(strlen(data))+1);
         if(map->value[map->size] == NULL || map->key[map->size] == NULL){
             free(map->value[map->size]);
             map->value[map->size] = NULL;
@@ -227,7 +219,7 @@ MapResult mapPut(Map map, const char* key, const char* data){
     return MAP_ERROR;
 }
 
-//expand function trying to reallocate make space to keys and values array
+//expand function trying to reallocate more space to keys and values array
 static MapResult expand(Map map) {
     int newSize = EXPAND_FACTOR * map->maxSize;
     assert(map->key);
@@ -240,8 +232,6 @@ static MapResult expand(Map map) {
         free(newValue);
         return MAP_OUT_OF_MEMORY;
     }
-    //memset(newKey+map->maxSize, 0, newSize-map->maxSize);
-    //memset(newValue+map->maxSize, 0, newSize-map->maxSize);
     //updating the pointers
     map->key = newKey;
     map->value = newValue;

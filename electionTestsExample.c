@@ -5,7 +5,7 @@
 #include "../test_utilities.h"
 
 /*The number of tests*/
-#define NUMBER_TESTS 10
+#define NUMBER_TESTS 5
 #define MAX_STR_LEN 20 //Must be greater than 1
 #define MAX_VOTES 100 //Must be greater than 1
 #define NUM_OF_AREAS 30 //Do not lower beneath 12
