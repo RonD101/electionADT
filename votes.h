@@ -17,13 +17,13 @@
 *   voteCreate		- Creates a new empty vote
 *   voteDestroy		- Deletes an existing vote and frees all resources
 *   voteAddTribe	- Adds tribe
-*   voteAddArea  	- Adds map object (area)
+*   voteAddArea  	- Adds map element (area)
 *   voteRemoveTribe	- Removes a tribe that matches the given element of tribe_id
 *   voteRemoveArea	- Removes a map container that matches the given element of area_id
-*   voteAdd		    - Advances the internal iterator to the next key and                            ++++++++++
+*   voteAdd		    - Adds a number of votes from one area to one tribe
 *	voteTribeContain - Returns whether or not a tribe that matches the given element of tribe_id exists
-*   voteNumOfVotes	- Creates a new empty map                           ++++++++++
-*   voteMostVoted	- Creates a new empty map                           ++++++++++
+*   voteNumOfVotes	- Returns the number of votes from one area to one tribe
+*   voteMostVoted	- Returns the tribe name with most votes from an area
 */
 
 /** Type for defining the votes */
@@ -124,23 +124,69 @@ VoteResult voteRemoveArea(Votes vote, int area_id);
 
 /**
 *  voteAdd: Adds a number of votes from one area to one tribe.
+*  If the argument votes_num is negative, votes will be removed.
+*  If the new value of votes for the tribe passed is negative, it will be update to 0.
 *
 * @param vote -
 * 	The vote for which to update the number of votes.
 * @param tribe_idElement
-*   The tribe_id to find and remove from the vote.
+*   The tribe_id for which to update the number of votes.
 * @param area_idElement
+*   The area_id for which to update the number of votes.
+* @param votes_num
+*   The number of votes that need to be added.
 * @return
 *  VOTES_NULL_ARGUMENT if one of the params is NULL
-*  VOTES_SUCCESS the elements had been removed successfully or no such area exists
+*  VOTES_INVALID_ID if area_id or tribe_id is negative
+*  VOTES_OUT_OF_MEMORY if an allocation failed
+*  VOTES_SUCCESS if the number of votes have been updated successfully
 */
 VoteResult voteAdd(Votes vote, const int tribe_id, const int area_id, int votes_num);
 
+/**
+* voteTribeContain: Checks if a tribe element exists in the vote.
+* If found returns where in the vote the tribe element is.
+*
+* @param vote - The vote to search in
+* @param tribe_id - The tribe with this id to look for.
+* @return
+* 	-1 - if vote is null, or if the tribe element was not found.
+* 	The index of the tribe if it was found.
+*/
 int voteTribeContain(Votes vote,int tribe_id);
 
+/**
+*  voteNumOfVotes: Returns the number of votes from one area to one tribe.
+*
+* @param vote -
+* 	The vote in which to search for the number of votes from one area to one tribe.
+* @param area_idElement
+*   The area to search for.
+* @param tribe_idElement
+*   The tribe to search for.
+*
+* @return
+*  VOTES_NULL_ARGUMENT if one of the params is NULL
+*  VOTES_INVALID_ID if area_id or tribe_id is negative
+*  VOTES_OUT_OF_MEMORY if an allocation failed
+*  The number of votes from one area to one tribe if they were found successfully
+*/
 int voteNumOfVotes(Votes vote, int area_id, int tribe_id);
 
-
+/**
+*  voteMostVoted: Returns the tribe name with most votes from an area.
+*  If two or more tribes received the same number of votes from the area,
+*  the function will return the tribe name with the lowest id
+*
+*  @param vote -
+*   The vote to search in.
+*  @param area_id_str
+*   The area id of the area we want to check how many votes it has to each tribe
+*
+* @return
+*  null if one of the params is NULL
+*  The tribe name with the most number of votes from the area with id equal to area_id_str
+*/
 char* voteMostVoted(Votes vote, char* area_id_str);
 
 #endif //ELECTIONADT_VOTES_H
